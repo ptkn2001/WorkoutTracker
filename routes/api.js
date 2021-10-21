@@ -16,7 +16,6 @@ router.get('/stats', (req, res) =>
 
 
 router.post("/api/workouts", ({ body }, res) => {
-    //TODO: Create a new workout
     db.Workout.create(body)
         .then(dbWorkout => {
             res.json(dbWorkout);
@@ -27,9 +26,28 @@ router.post("/api/workouts", ({ body }, res) => {
 });
 
 router.get("/api/workouts", (req, res) => {
-    //TODO: Get all the workouts
-    db.Workout.find({})
-        .sort({ day: 1 })
+    db.Workout.aggregate([{
+            $addFields: {
+                totalDuration: { $sum: "$exercises.duration" }
+            }
+        }])
+        .then(dbWorkout => {
+            res.json(dbWorkout);
+        })
+        .catch(err => {
+            res.status(400).json(err);
+        });
+});
+
+router.put("/api/workouts/:id", (req, res) => {
+    if (!req.body.name) {
+        res.json({ message: "exercise data incomplete." });
+        return;
+    }
+
+    db.Workout.findOneAndUpdate({ _id: req.params.id }, {
+            $push: { exercises: req.body }
+        })
         .then(dbWorkout => {
             res.json(dbWorkout);
         })
@@ -39,12 +57,7 @@ router.get("/api/workouts", (req, res) => {
 
 });
 
-router.put("/api/workouts/:id", ({ body }, res) => {
-    //TODO: Update the workout by id to add a new excercise
-
-});
-
-router.get("/api/workouts/:range", (req, res) => {
+router.get("/api/workouts/range", (req, res) => {
     //TODO:  Get the workouts in a range
 
 
