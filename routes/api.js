@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const db = require("../models");
 const path = require("path");
+const winston = require('winston');
 
 router.get('/', (req, res) =>
     res.sendFile(path.join(__dirname, '../public/index.html'))
@@ -16,7 +17,7 @@ router.get('/stats', (req, res) =>
 
 
 router.post("/api/workouts", ({ body }, res) => {
-    console.log(body);
+    winston.log(body);
     db.Workout.create(body)
         .then(dbWorkout => {
             res.json(dbWorkout);
