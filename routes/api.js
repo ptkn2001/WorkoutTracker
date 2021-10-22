@@ -17,12 +17,17 @@ router.get('/stats', (req, res) =>
 
 
 router.post("/api/workouts", ({ body }, res) => {
-    winston.log(body);
     db.Workout.create(body)
         .then(dbWorkout => {
+            winston.log('info', '/api/workouts POST result', {
+                result: dbWorkout
+            });
             res.json(dbWorkout);
         })
         .catch(err => {
+            winston.log('error', '/api/workouts POST error', {
+                error: err
+            });
             res.status(400).json(err);
         });
 });
@@ -54,6 +59,9 @@ router.put("/api/workouts/:id", (req, res) => {
             res.json(dbWorkout);
         })
         .catch(err => {
+            winston.log('error', '/api/workouts/:id PUT error', {
+                error: err
+            });
             res.status(400).json(err);
         });
 
